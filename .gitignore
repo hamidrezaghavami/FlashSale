@@ -1,0 +1,19 @@
+# Dependency directories (ignores node_modules in api/, worker/, and root)
+**/node_modules/
+node_modules/
+
+# Environment variables & secrets (keep these out of GitHub!)
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# Docker/System files
+.DS_Store
+Thumbs.db
