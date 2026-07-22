@@ -1,10 +1,10 @@
 {
-  "name": "api",
+  "name": "flashsale-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "High-throughput API producer for ingesting flash sale orders",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
