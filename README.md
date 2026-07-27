@@ -69,3 +69,27 @@ To prove this architecture actually works, run this diagnostic test:
    docker-compose start worker
    ```
    *Observation:* Watch the worker console logs. It will immediately begin draining the queue, processing and saving all 100 pending orders safely into the database without losing a single one.
+
+5. **🚀 Running the Project:**
+   *1. Start the Docker Cluster* Build and launch the load balancer, message broker, database, and microservices in detached mode:
+   `docker compose up -d --build`
+   then after **10 seconds**: 
+   `k6 run load-test.js`
+   *100 concurrent virtual users (who collectively sent 9,751 total requests).*
+```
+scenarios: (100.00%) 1 scenario, 100 max VUs, 10s max duration
+              * default: 100 looping VUs for 10s
+
+     ✓ status is 202 Accepted
+
+     checks.........................: 100.00% ✓ 9751      ✗ 0
+     http_req_failed................: 0.00%   ✓ 0         ✗ 9751
+     http_req_duration..............: avg=2.35ms   min=424.11µs   med=1.23ms   max=85.24ms   p(95)=4.85ms
+     http_reqs......................: 9751    965.15/s
+     vus............................: 100     min=100     max=100
+```
+**Summary**
+1. Throughput: ~965 requests/sec
+2. Average Latency: 2.35 ms
+3. Peak Latency (p95): 4.85 ms
+4. Success Rate: 100% (0 errors across 9,751 requests)
