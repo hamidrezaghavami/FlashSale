@@ -1,10 +1,10 @@
-# Flash Sale Order Buffer
+# ⚡ Flash Sale Order Buffer
 
-A high-throughput, resilient order ingestion system designed to handle massive traffic spikes (like a flash sale) without crashing the database. It uses **Nginx** as a load balancer, **Docker** for orchestration, and **Kafka** as a shock-absorbing message queue.
+A high-throughput, resilient order ingestion system designed to handle massive traffic spikes without crashing the database. Built with **Nginx** (load balancing), **Docker** (orchestration), and **Apache Kafka** (shock-absorbing message queue).
 
-## System Architecture
+## 🏗️ System Architecture
 
-```
+```text
 [User Traffic] 
       │
       ▼
@@ -14,9 +14,9 @@ A high-throughput, resilient order ingestion system designed to handle massive t
       ├──────────────────────┐
       ▼                      ▼
 ┌───────────┐          ┌───────────┐
-│ Node API  │ (Instance 1) │ Node API  │ (Instance 2)
+│ Node API  │ (Inst 1) │ Node API  │ (Inst 2)
 └─────┬─────┘          └─────┬─────┘
-      │                      │ (Instantly pushes orders to queue)
+      │ (Instantly pushes orders to queue)
       ▼                      ▼
 ┌──────────────────────────────────┐
 │          Kafka Cluster           │ (Conveyor Belt Buffer)
@@ -27,7 +27,6 @@ A high-throughput, resilient order ingestion system designed to handle massive t
          │   Worker App    │ (Processes orders & saves to DB)
          └─────────────────┘
 ```
-
 ## The Core Point: Why We Build This
 
 In a traditional setup, sending 10,000 simultaneous requests directly to an API that writes to a database will result in connection timeouts, memory leaks, or a complete database crash. 
@@ -40,11 +39,14 @@ If traffic spikes, **Kafka acts as a shock absorber (buffer)**, holding the mess
 
 ---
 
-## How to Run & Verify ("The Aha! Moment")
+## How to Run & Verify
 
 ### 1. Spin up the infrastructure
+Build and launch the load balancer, message broker, database, and microservices in detached mode:
 ```bash
-docker-compose up -d
+docker compose up -d --build
+
+wait 10 seconds for Zookeper & Kafka finishing setup
 ```
 
 ### 2. Test the Shock Absorber
@@ -52,7 +54,7 @@ To prove this architecture actually works, run this diagnostic test:
 
 1. **Stop the Worker App** (simulating database maintenance or high load):
    ```bash
-   docker-compose stop worker
+   docker compose stop worker
    ```
 2. **Spam the system with requests** (simulating a sudden flash sale):
    ```bash
@@ -66,9 +68,9 @@ To prove this architecture actually works, run this diagnostic test:
 
 4. **Start the Worker:**
    ```bash
-   docker-compose start worker
+   docker compose start worker
    ```
-   *Observation:* Watch the worker console logs. It will immediately begin draining the queue, processing and saving all 100 pending orders safely into the database without losing a single one.
+   *Observation:* Watch the worker console logs `docker compose logs -f worker`. It will immediately wake up and begin draining the queue, processing and saving all 100 pending orders safely into PostgreSQL without losing a single one..
 
 5. **🚀 Running the Project:**
    *1. Start the Docker Cluster* Build and launch the load balancer, message broker, database, and microservices in detached mode:
@@ -93,3 +95,12 @@ scenarios: (100.00%) 1 scenario, 100 max VUs, 10s max duration
 2. Average Latency: 2.35 ms
 3. Peak Latency (p95): 4.85 ms
 4. Success Rate: 100% (0 errors across 9,751 requests)
+
+## 🛠️ Challenges & Solutions
+
+While building and load-testing this distributed architecture, I tackled four main bottlenecks:
+
+1. **Nginx Routing:** Fixed config syntax and block structures to properly load-balance traffic across both Node.js API containers.
+2. **Database Auth:** Resolved Postgres username and environment variable interferences between Docker microservices.
+3. **Endpoint Alignment:** Synced the k6 load-test script URLs directly with the Express `app.js` routes to fix dropped requests.
+4. **Kafka Startup Timing:** Node.js boots faster than Kafka. To prevent connection timeouts, I factored in a 10-second delay so Zookeeper and Kafka have time to complete their broker handshakes before blasting traffic.
