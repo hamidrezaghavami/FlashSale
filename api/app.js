@@ -1,17 +1,16 @@
 // Your web server code; it receives the 
 // checkout request and immediately publishes it to the Kafka queue.
 import express from 'express';
-import { kafka } from 'kafkajs';
+import { Kafka } from 'kafkajs';
 
 const app = express();
 app.use(express.json());
 
-const kafkaPost = process.env.KAFKA_POST || 'kafka:9092';
-
+const KAFKA_BROKER = process.env.KAFKA_BROKER || 'kafka:29092';
 const PORT = process.env.PORT || 3000;
 
 // initialized Kafka Client
-const kafka = new kafka({ 
+const kafka = new Kafka({ 
     clientID: 'api-server',
     brokers: [`${KAFKA_BROKER}`],
 });
@@ -19,17 +18,13 @@ const kafka = new kafka({
 // Create Producer Instance
 const producer = kafka.producer();
 
-async function kafka () {
-    const orderData = await producer.connect();
-}
-
-app.post('/order', async (req, res) => {
+app.post('/', async (req, res) => {
     try {
-        const { userID, producerID, quantity } = req.body;
+        const { userID, productId, quantity } = req.body;
 
         const orderData = { 
             userID, 
-            producerID,
+            productId,
             quantity,
             createdAt: new Date().toString(), // convert into string
         };
@@ -57,7 +52,7 @@ const startServer = async () => {
         });
     } catch (error) { 
         console.log('Failed to start API producer:', error);
-        producer.exit(1);
+        process.exit(1);
     }
 }
 
