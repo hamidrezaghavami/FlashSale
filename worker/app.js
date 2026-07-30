@@ -5,7 +5,7 @@ import pg from "pg";
 const { Pool } = pg;
 
 // Environment Setup
-const KAFKA_BROKER = process.env.KAFKA_BROKER || 'kafka:9092';
+const KAFKA_BROKER = process.env.KAFKA_BROKER || 'kafka:29092';
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://sales_user:sales_password@postgres:5432/flashsale_db';
 
 // Initialize PostgreSQL Pool
