@@ -1,17 +1,17 @@
 {
   "name": "worker",
   "version": "1.0.0",
-  "description": "",
+  "description": "Background worker to consume orders from Kafka and persist to PostgreSQL",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "HamidReza Ghavami",
+  "license": "MIT",
   "type": "module",
   "dependencies": {
-    "express": "^5.2.1",
-    "kafkajs": "^2.2.4"
+    "kafkajs": "^2.2.4",
+    "pg": "^8.22.0"
   }
 }
