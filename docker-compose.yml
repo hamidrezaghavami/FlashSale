@@ -3,7 +3,7 @@
 version: '3.8'
 
 services:
-  # 1. The Database: PostgreSQL (Source of Truth)
+  # The Database: PostgreSQL (Source of Truth)
   postgres:
     image: postgres:15-alpine
     container_name: db_container
@@ -12,13 +12,13 @@ services:
       POSTGRES_PASSWORD: sales_password
       POSTGRES_DB: flashsale_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
 
-  # 2. Zookeeper: Manages the Kafka cluster state
+  # Zookeeper: Manages the Kafka cluster state
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: zookeeper_container
@@ -38,7 +38,8 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -53,7 +54,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - KAFKA_BROKER=kafka:9092
+      - KAFKA_BROKER=kafka:29092
     depends_on:
       - kafka
     networks:
@@ -67,7 +68,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - KAFKA_BROKER=kafka:9092
+      - KAFKA_BROKER=kafka:29092
     depends_on:
       - kafka
     networks:
